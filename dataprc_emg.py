@@ -8,7 +8,6 @@ def save_model(model, name=''):
 
     save_dir = 'pre_trained_models'
 
-    # 检测目录是否存在，如果不存在则创建
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
@@ -49,18 +48,15 @@ def split_and_pad(sequence, num_rows):
 
 
 def balance_lists(samples_z, samples_b, samples_l, samples_t):
-    # 找出四个列表中元素个数最多的那个
     max_length = max(len(samples_z), len(samples_b), len(samples_l), len(samples_t))
 
-    # 定义一个函数来扩展列表到指定的长度
     def extend_list(lst, target_length):
         original_length = len(lst)
-        # 通过循环复制原始列表中的元素直到达到目标长度
-        # 通过循环复制原始列表中的元素直到达到目标长度
+ 
         while len(lst) < target_length:
             lst.extend(lst[:target_length - len(lst)])
 
-    # 扩展其他列表到max_length
+ 
     if len(samples_z) < max_length:
         extend_list(samples_z, max_length)
     if len(samples_b) < max_length:
@@ -76,28 +72,14 @@ def balance_lists(samples_z, samples_b, samples_l, samples_t):
 
 
 def add_gaussian_noise(X, noise_mean=0, noise_std=0.1):
-    """
-    给输入的数组 X 添加高斯噪声。
-
-    参数:
-    X: numpy 数组，要添加噪声的数组，维度为 (样本数, 维度1, 维度2)。
-    noise_mean: float，高斯噪声的均值，默认为 0。
-    noise_std: float，高斯噪声的标准差，默认为 0.1。
-
-    返回:
-    添加了高斯噪声的数组。
-    """
+ 
     sample_dim, dim_1, dim_2 = X.shape
-    # 复制输入数组以避免修改原始数据
     noisy_X = X.copy()
 
     for sample_index in range(sample_dim):
-        # 随机选择起始位置
-        start_index = np.random.randint(0, dim_1)
-        # 随机选择连续段长度
-        segment_length = np.random.randint(1, dim_1 - start_index + 1)
-        # 生成噪声并添加
-        noise = np.random.normal(noise_mean, noise_std, size=(segment_length, dim_2))
+         start_index = np.random.randint(0, dim_1)
+         segment_length = np.random.randint(1, dim_1 - start_index + 1)
+         noise = np.random.normal(noise_mean, noise_std, size=(segment_length, dim_2))
         noisy_X[sample_index, start_index:start_index+segment_length, :] += noise
 
     return noisy_X
@@ -106,11 +88,9 @@ def add_gaussian_noise(X, noise_mean=0, noise_std=0.1):
 def interleave_and_merge(data1, data2, data3, labels0,labels0_1,labels0_2, labels0_3,labels0_4,labels0_5,
                          labels1,labels1_1,labels1_2, labels1_3,labels1_4,labels1_5,
                          labels2,labels2_1,labels2_2, labels2_3,labels2_4,labels2_5):
-    # 确定样本数
     len1, len2, len3 = len(data1), len(data2), len(data3)
     total_samples = len1 + len2 + len3
 
-    # 初始化最终的数据和标签数组
     merged_data = []
     merged_labels = []
     merged_labels_1 = []
@@ -119,7 +99,6 @@ def interleave_and_merge(data1, data2, data3, labels0,labels0_1,labels0_2, label
     merged_labels_4 = []
     merged_labels_5 = []
 
-    # 依次从三个数组中取样本
     indices1, indices2, indices3 = 0, 0, 0
     while indices1 < len1 or indices2 < len2 or indices3 < len3:
         if indices1 < len1:
@@ -150,7 +129,6 @@ def interleave_and_merge(data1, data2, data3, labels0,labels0_1,labels0_2, label
             merged_labels_5.append(labels2_5[indices3])
             indices3 += 1
 
-    # 转换为numpy数组
     merged_data = np.array(merged_data)
     merged_labels = np.array(merged_labels)
     merged_labels_1 = np.array(merged_labels_1)
@@ -162,15 +140,12 @@ def interleave_and_merge(data1, data2, data3, labels0,labels0_1,labels0_2, label
     return merged_data, merged_labels, merged_labels_1, merged_labels_2, merged_labels_3, merged_labels_4, merged_labels_5
 
 def interleave_and_merge2(data1, data2, data3, labels1, labels2, labels3):
-    # 确定样本数
     len1, len2, len3 = len(data1), len(data2), len(data3)
     total_samples = len1 + len2 + len3
 
-    # 初始化最终的数据和标签数组
     merged_data = []
     merged_labels = []
 
-    # 依次从三个数组中取样本
     indices1, indices2, indices3 = 0, 0, 0
     while indices1 < len1 or indices2 < len2 or indices3 < len3:
         if indices1 < len1:
@@ -186,7 +161,6 @@ def interleave_and_merge2(data1, data2, data3, labels1, labels2, labels3):
             merged_labels.append(labels3[indices3])
             indices3 += 1
 
-    # 转换为numpy数组
     merged_data = np.array(merged_data)
     merged_labels = np.array(merged_labels)
 
@@ -194,15 +168,13 @@ def interleave_and_merge2(data1, data2, data3, labels1, labels2, labels3):
 
 
 def shujuzengqiang(X_train_padded2, y_train_fenlei):
-    # 分别初始化三个空列表来存储不同标签的数据和标签
-    X_train_class_0 = []
+     X_train_class_0 = []
     X_train_class_1 = []
     X_train_class_2 = []
 
     y_train_class_0 = []
     y_train_class_1 = []
     y_train_class_2 = []
-    # 遍历所有数据和标签，根据标签将数据和标签分别存入对应的列表中
     for data, label in zip(X_train_padded2, y_train_fenlei):
         if label == 0:
             X_train_class_0.append(data)
@@ -214,7 +186,6 @@ def shujuzengqiang(X_train_padded2, y_train_fenlei):
             X_train_class_2.append(data)
             y_train_class_2.append(label)
 
-    # 将列表转换为numpy数组
     X_train_class_0 = np.array(X_train_class_0)
     X_train_class_1 = np.array(X_train_class_1)
     X_train_class_2 = np.array(X_train_class_2)
@@ -223,14 +194,11 @@ def shujuzengqiang(X_train_padded2, y_train_fenlei):
     y_train_class_1 = np.array(y_train_class_1)
     y_train_class_2 = np.array(y_train_class_2)
 
-    # 复制 X_train_class_0 并添加高斯噪声
-    # X_train_class_0_noisy = X_train_class_0 + np.random.normal(0, 0.1, X_train_class_0.shape)
+     # X_train_class_0_noisy = X_train_class_0 + np.random.normal(0, 0.1, X_train_class_0.shape)
     X_train_class_0_noisy = add_gaussian_noise(X_train_class_0)
-    # 合并原始数据和添加噪声后的数据
     X_train_class_0_augmented = np.concatenate((X_train_class_0, X_train_class_0_noisy), axis=0)
     y_train_class_0_augmented = np.concatenate((y_train_class_0, y_train_class_0), axis=0)
 
-    # 计算样本数差异
     num_samples_0 = X_train_class_0_augmented.shape[0]
     num_samples_1 = X_train_class_1.shape[0]
     num_samples_2 = X_train_class_2.shape[0]
@@ -238,15 +206,12 @@ def shujuzengqiang(X_train_padded2, y_train_fenlei):
     diff_1 = num_samples_0 - num_samples_1
     diff_2 = num_samples_0 - num_samples_2
 
-    # 计算需要复制的倍数
     replicate_factor_1 = diff_1 / num_samples_1
     replicate_factor_2 = diff_2 / num_samples_2
 
-    # 复制并添加噪声
     X_train_class_1_replicated = np.tile(X_train_class_1, (int(replicate_factor_1), 1, 1))
     X_train_class_2_replicated = np.tile(X_train_class_2, (int(replicate_factor_2), 1, 1))
 
-    # 处理余数部分
     remainder_1 = X_train_class_1[:int(replicate_factor_1 % 1 * num_samples_1)]
     remainder_2 = X_train_class_2[:int(replicate_factor_2 % 1 * num_samples_2)]
 
@@ -256,11 +221,9 @@ def shujuzengqiang(X_train_padded2, y_train_fenlei):
     X_train_class_1_noisy = add_gaussian_noise(X_train_class_1_augmented)
     X_train_class_2_noisy = add_gaussian_noise(X_train_class_2_augmented)
 
-    # 合并原始数据和添加噪声后的数据
     X_train_class_1_final = np.concatenate((X_train_class_1, X_train_class_1_noisy), axis=0)
     X_train_class_2_final = np.concatenate((X_train_class_2, X_train_class_2_noisy), axis=0)
 
-    # 更新标签
     y_train_class_1_final = np.hstack((y_train_class_1, [1] * X_train_class_1_noisy.shape[0]))
     y_train_class_2_final = np.hstack((y_train_class_2, [2] * X_train_class_2_noisy.shape[0]))
 
@@ -268,18 +231,14 @@ def shujuzengqiang(X_train_padded2, y_train_fenlei):
                                             y_train_class_0_augmented, y_train_class_1_final, y_train_class_2_final)
     return X_train, Y_train
 
-
-
-
-
 def loading_data2():
     """
     Load data from specified paths, apply column-wise softmax normalization,
     and return train/test data and labels after splitting and padding.
     """
     # Specified paths and parameters
-    data_folder_path = r"D:\实验数据\jidian-97\PHQ_9_2"
-    csv_file_path = r"D:\实验数据\实验结果.csv"
+    data_folder_path = r"PHQ_9_2"
+    csv_file_path = r"result.csv"
     normalization = True
     num_rows_z = 88
     num_rows_b = 36
@@ -428,7 +387,6 @@ def loading_data2():
     y_train_data_Op = np.array(y_train_data_Op)
     y_test_data_Op = np.array(y_test_data_Op)
 
-    # 分别初始化三个空列表来存储不同标签的数据和标签
     X_train_class_0 = []
     X_train_class_1 = []
     X_train_class_2 = []
@@ -451,7 +409,6 @@ def loading_data2():
     y_train_class_2_Co = []
     y_train_class_2_Ne = []
     y_train_class_2_Op = []
-    # 遍历所有数据和标签，根据标签将数据和标签分别存入对应的列表中
     for data, label, label_Ex, label_Ag, label_Co, label_Ne, label_Op in zip(X_train_z, y_train_fenlei,
                                                                              y_train_data_Ex, y_train_data_Ag,
                                                                              y_train_data_Co, y_train_data_Ne,
@@ -482,7 +439,7 @@ def loading_data2():
             y_train_class_2_Ne.append(label_Ne)
             y_train_class_2_Op.append(label_Op)
 
-    # 将列表转换为numpy数组
+
     X_train_class_0 = np.array(X_train_class_0)
     X_train_class_1 = np.array(X_train_class_1)
     X_train_class_2 = np.array(X_train_class_2)
@@ -506,10 +463,8 @@ def loading_data2():
     y_train_class_2_Ne = np.array(y_train_class_2_Ne)
     y_train_class_2_Op = np.array(y_train_class_2_Op)
 
-    # 复制 X_train_class_0 并添加高斯噪声
-    # X_train_class_0_noisy = X_train_class_0 + np.random.normal(0, 0.1, X_train_class_0.shape)
+     # X_train_class_0_noisy = X_train_class_0 + np.random.normal(0, 0.1, X_train_class_0.shape)
     X_train_class_0_noisy = add_gaussian_noise(X_train_class_0)
-    # 合并原始数据和添加噪声后的数据
     X_train_class_0_augmented = np.concatenate((X_train_class_0, X_train_class_0_noisy), axis=0)
     y_train_class_0_augmented = np.concatenate((y_train_class_0, y_train_class_0), axis=0)
     y_train_class_0_Ex = np.concatenate((y_train_class_0_Ex, y_train_class_0_Ex), axis=0)
@@ -518,7 +473,6 @@ def loading_data2():
     y_train_class_0_Ne = np.concatenate((y_train_class_0_Ne, y_train_class_0_Ne), axis=0)
     y_train_class_0_Op = np.concatenate((y_train_class_0_Op, y_train_class_0_Op), axis=0)
 
-    # 计算样本数差异
     num_samples_0 = X_train_class_0_augmented.shape[0]
     num_samples_1 = X_train_class_1.shape[0]
     num_samples_2 = X_train_class_2.shape[0]
@@ -526,11 +480,9 @@ def loading_data2():
     diff_1 = num_samples_0 - num_samples_1
     diff_2 = num_samples_0 - num_samples_2
 
-    # 计算需要复制的倍数
     replicate_factor_1 = diff_1 / num_samples_1
     replicate_factor_2 = diff_2 / num_samples_2
 
-    # 复制并添加噪声
     X_train_class_1_replicated = np.tile(X_train_class_1, (int(replicate_factor_1), 1, 1))
     X_train_class_2_replicated = np.tile(X_train_class_2, (int(replicate_factor_2), 1, 1))
     y_train_class_1_replicated = np.tile(y_train_class_1, int(replicate_factor_1))
@@ -546,7 +498,6 @@ def loading_data2():
     y_train_class_2_Ne_replicated = np.tile(y_train_class_2_Ne, int(replicate_factor_2))
     y_train_class_2_Op_replicated = np.tile(y_train_class_2_Op, int(replicate_factor_2))
 
-    # 处理余数部分
     remainder_1 = X_train_class_1[:int(replicate_factor_1 % 1 * num_samples_1)]
     remainder_2 = X_train_class_2[:int(replicate_factor_2 % 1 * num_samples_2)]
     y_remainder_1 = y_train_class_1[:int(replicate_factor_1 % 1 * num_samples_1)]
@@ -580,7 +531,6 @@ def loading_data2():
     X_train_class_1_noisy = add_gaussian_noise(X_train_class_1_augmented)
     X_train_class_2_noisy = add_gaussian_noise(X_train_class_2_augmented)
 
-    # 合并原始数据和添加噪声后的数据
     X_train_class_1_final = np.concatenate((X_train_class_1, X_train_class_1_noisy), axis=0)
     X_train_class_2_final = np.concatenate((X_train_class_2, X_train_class_2_noisy), axis=0)
     y_train_class_1_final = np.hstack((y_train_class_1, y_train_class_1_augmented))
@@ -596,7 +546,7 @@ def loading_data2():
     y_train_class_1_Op_final = np.hstack((y_train_class_1_Op, y_train_class_1_Op_augmented))
     y_train_class_2_Op_final = np.hstack((y_train_class_2_Op, y_train_class_2_Op_augmented))
 
-    # 更新标签
+
     # y_train_class_1_final = np.hstack((y_train_class_1, [1] * X_train_class_1_noisy.shape[0]))
     # y_train_class_2_final = np.hstack((y_train_class_2, [2] * X_train_class_2_noisy.shape[0]))
 
@@ -617,25 +567,6 @@ def loading_data2():
     return  (x_train_z , x_train_b , x_train_l , x_train_t ,
              X_test_z, X_test_b, X_test_l, X_test_t, y_train, y_test_fenlei, y_train_data_Ex, y_test_data_Ex , y_train_data_Ag,
             y_test_data_Ag, y_train_data_Co, y_test_data_Co ,y_train_data_Ne , y_test_data_Ne ,y_train_data_Op ,y_test_data_Op)
-
-
-
-
-'''if __name__ == '__main__':
-    (x_train_z, x_train_b, x_train_l, x_train_t,
-     X_test_z, X_test_b, X_test_l, X_test_t, y_train, y_test_fenlei, y_train_data_Ex, y_test_data_Ex, y_train_data_Ag,
-     y_test_data_Ag, y_train_data_Co, y_test_data_Co, y_train_data_Ne, y_test_data_Ne, y_train_data_Op, y_test_data_Op) = loading_data()
-
-
-
-
-    num_rows = 10
-    data_folder_path = r"C:/Users\su\Desktop\naodian-97\PHQ-9\test\46\4.csv"
-    csv_file = os.path.join(data_folder_path)
-    df = pd.read_csv(csv_file, header=None)
-    data_array = df.values
-    samples = split_and_pad(data_array, num_rows)
-    print(samples)'''
 
 
 

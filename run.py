@@ -14,16 +14,9 @@ import torch.nn as nn
 from sklearn.metrics import precision_score, f1_score
 import sys
 
-# 检查GPU是否可用，如果不可用，将使用CPU
+ 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-if torch.cuda.is_available():
-    num_gpus = torch.cuda.device_count()
-    print(f"可用的GPU数量: {num_gpus}")
-    current_gpu_name = torch.cuda.get_device_name(torch.cuda.current_device())
-    print(f"当前GPU: {current_gpu_name}")
-else:
-    print("GPU不可用。使用CPU。")
 
 (x_train_z_eeg, x_train_b_eeg, x_train_l_eeg, x_train_t_eeg, x_test_z_eeg, x_test_b_eeg, x_test_l_eeg, x_test_t_eeg, y_train_eeg, y_test_eeg, y_train_data_Ex_eeg, y_test_data_Ex_eeg, y_train_data_Ag_eeg,
 y_test_data_Ag_eeg, y_train_data_Co_eeg, y_test_data_Co_eeg, y_train_data_Ne_eeg, y_test_data_Ne_eeg, y_train_data_Op_eeg, y_test_data_Op_eeg) = loading_data()
@@ -57,7 +50,7 @@ batch_size = 64
 
 best_test_accuracies = []
 best_f1_scores = []
-best_model_details = {}  # 用于存储最佳模型的迭代次数和轮次
+best_model_details = {}   
 
 for iteration in range(1, 21):
     print(f"Starting iteration {iteration}")
@@ -199,7 +192,7 @@ for iteration in range(1, 21):
         else:
             param.requires_grad = True
 
-    # 打印参数的 requires_grad 状态以验证
+ 
     for name, param in model.named_parameters():
         print(f"Parameter: {name}, requires_grad: {param.requires_grad}")
 
@@ -212,7 +205,7 @@ for iteration in range(1, 21):
 
     best_test = 0
     best_f1 = 0
-    best_epoch = 0  # 记录当前迭代中最佳模型的轮次
+    best_epoch = 0   
 
     for epoch in range(epochs):
         model.train()
@@ -299,24 +292,22 @@ for iteration in range(1, 21):
                 print(f"Saved model at {model_path}!")
                 best_test = test_accuracy
                 best_f1 = f1
-                best_epoch = epoch + 1  # 记录最佳模型的轮次
+                best_epoch = epoch + 1   
 
     best_test_accuracies.append(best_test)
     best_f1_scores.append(best_f1)
     best_model_details[iteration] = (best_epoch, best_test, best_f1)   
-
-# 计算5次迭代中最佳测试准确度和F1分数的均值和标准差
+ 
 max_best_accuracy = np.max(best_test_accuracies)
 mean_best_accuracy = np.mean(best_test_accuracies)
 std_best_accuracy = np.std(best_test_accuracies)
 mean_best_f1 = np.mean(best_f1_scores)
 std_best_f1 = np.std(best_f1_scores)
-print(f"20次迭代中最佳测试准确度的最大值: {max_best_accuracy:.4f}")
-print(f"20次迭代中最佳测试准确度的均值: {mean_best_accuracy:.4f}")
-print(f"20次迭代中最佳测试准确度的标准差: {std_best_accuracy:.4f}")
-print(f"20次迭代中最佳F1分数的均值: {mean_best_f1:.4f}")
-print(f"20次迭代中最佳F1分数的标准差: {std_best_f1:.4f}")
+print(f"max_best_accuracy: {max_best_accuracy:.4f}")
+print(f"mean_best_accuracy: {mean_best_accuracy:.4f}")
+print(f"std_best_accuracy: {std_best_accuracy:.4f}")
+print(f"mean_best_f1: {mean_best_f1:.4f}")
+print(f"std_best_f1: {std_best_f1:.4f}")
 
-# 打印出5次迭代的最好模型的次数和轮次
 for iteration, (epoch, accuracy, f1) in best_model_details.items():
     print(f"Iteration {iteration} had the best model at epoch {epoch} with accuracy {accuracy:.4f} and f1 {f1:.4f}")

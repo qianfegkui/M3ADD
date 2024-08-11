@@ -9,15 +9,15 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class MULTAV_CLASSFICATIONModel1(nn.Module):
     def __init__(self):
         super(MULTAV_CLASSFICATIONModel1, self).__init__()
-        self.input_dim1 = 211  # 输入特征的数量
+        self.input_dim1 = 211  
         self.input_dim2 = 220
-        self.hidden_dim = 30  # 隐藏单元的数量
+        self.hidden_dim = 30  
         self.hidden_dim2 = 240
         self.hidden_dim3 = 960
         #self.hidden_dim3 = 480
-        self.num_layers = 1  # LSTM 层的数量
-        self.num_heads = 10  # 注意力头的数量
-        self.output_dim = 3  # 输出单元的数量
+        self.num_layers = 1   
+        self.num_heads = 10   
+        self.output_dim = 3   
         self.out_dropout1 = 0.1
         self.out_dropout = 0.2
 
@@ -114,7 +114,7 @@ class MULTAV_CLASSFICATIONModel1(nn.Module):
         mask_l_emg = torch.all(x_l_emg == 0, dim=-1)
         mask_t_emg = torch.all(x_t_emg == 0, dim=-1)
 
-        # CNN 层
+ 
         x_z_eeg = x_z_eeg.permute(0, 2, 1)  
         x_z_eeg = self.cnn_z_eeg(x_z_eeg)
         x_z_eeg = x_z_eeg.permute(0, 2, 1)  
@@ -131,7 +131,7 @@ class MULTAV_CLASSFICATIONModel1(nn.Module):
         x_t_eeg = self.cnn_t_eeg(x_t_eeg)
         x_t_eeg = x_t_eeg.permute(0, 2, 1)  
 
-        # CNN 层
+ 
         x_z_emg = x_z_emg.permute(0, 2, 1)  
         x_z_emg = self.cnn_z_emg(x_z_emg)
         x_z_emg = x_z_emg.permute(0, 2, 1)  
