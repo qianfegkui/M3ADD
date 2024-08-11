@@ -14,17 +14,6 @@ from model2 import MULTAV_CLASSFICATIONModel1
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-if torch.cuda.is_available():
-    num_gpus = torch.cuda.device_count()
-    print(f"可用的GPU数量: {num_gpus}")
-    current_gpu_name = torch.cuda.get_device_name(torch.cuda.current_device())
-    print(f"当前GPU: {current_gpu_name}")
-else:
-    print("GPU不可用。使用CPU。")
-
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-
 (x_train_z_eeg, x_train_b_eeg, x_train_l_eeg, x_train_t_eeg, x_test_z_eeg, x_test_b_eeg, x_test_l_eeg, x_test_t_eeg, y_train_eeg, y_test_eeg, y_train_data_Ex_eeg, y_test_data_Ex_eeg, y_train_data_Ag_eeg,
 y_test_data_Ag_eeg, y_train_data_Co_eeg, y_test_data_Co_eeg, y_train_data_Ne_eeg, y_test_data_Ne_eeg, y_train_data_Op_eeg, y_test_data_Op_eeg) = loading_data()
 
