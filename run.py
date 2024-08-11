@@ -5,15 +5,14 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 from sklearn.metrics import classification_report
 import numpy as np
-from shujuchuli_eeg import loading_data, save_model, load_model
-from shujuchuli_emg import loading_data2
+from dataprc_eeg import loading_data, save_model, load_model
+from dataprc_emg import loading_data2
 from model2 import MULTAV_CLASSFICATIONModel1
-#from focalloss import FocalLoss
+
 import torch
 import torch.nn as nn
 from sklearn.metrics import precision_score, f1_score
 import sys
-#sys.path.append(r'D:\pycharm\SKF\lstm_attention-p\danmotai_fenlei_one\shiyan_eeg_danshijian_per')
 
 # 检查GPU是否可用，如果不可用，将使用CPU
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -25,7 +24,6 @@ if torch.cuda.is_available():
     print(f"当前GPU: {current_gpu_name}")
 else:
     print("GPU不可用。使用CPU。")
-
 
 (x_train_z_eeg, x_train_b_eeg, x_train_l_eeg, x_train_t_eeg, x_test_z_eeg, x_test_b_eeg, x_test_l_eeg, x_test_t_eeg, y_train_eeg, y_test_eeg, y_train_data_Ex_eeg, y_test_data_Ex_eeg, y_train_data_Ag_eeg,
 y_test_data_Ag_eeg, y_train_data_Co_eeg, y_test_data_Co_eeg, y_train_data_Ne_eeg, y_test_data_Ne_eeg, y_train_data_Op_eeg, y_test_data_Op_eeg) = loading_data()
@@ -57,7 +55,6 @@ k2 = 0.1
 epochs = 200
 batch_size = 64
 
-# 创建空列表来存储每次迭代的最佳测试准确度和F1分数
 best_test_accuracies = []
 best_f1_scores = []
 best_model_details = {}  # 用于存储最佳模型的迭代次数和轮次
@@ -68,7 +65,7 @@ for iteration in range(1, 21):
     model = MULTAV_CLASSFICATIONModel1().to(device)
 #
     saved_model_1 = torch.load(
-        r"D:\pycharm\SKF\实验结果\our\eeg-duoshijian\抑郁\per_tongdao\0.005-0.000005-0.8684\best_model_iteration_16_epoch_183.pt.pt")
+        r"\best_model.pt")
     state_dict_1 = saved_model_1.state_dict()
     state_dict_eeg = {}
 
@@ -79,7 +76,7 @@ for iteration in range(1, 21):
 
     # Example usage:
     saved_model_2 = torch.load(
-        r"D:\pycharm\SKF\实验结果\our\emg-duoshijian\抑郁\per-tongdao\0.006-0.000005-0.7368()\best_model_iteration_5_epoch_9.pt.pt")
+        r"best_model_iteration_5_epoch_9.pt")
     state_dict_2 = saved_model_2.state_dict()
     state_dict_emg = {}
 
@@ -88,22 +85,18 @@ for iteration in range(1, 21):
         new_key = '_emg.'.join(new_key)
         state_dict_emg[new_key] = value
 
-    # 获取新模型的状态字典
     model_dict = model.state_dict()
 
-    # 创建一个新的状态字典，包含匹配的权重
     matched_state_dict_1 = {k: v for k, v in state_dict_eeg.items() if
                             k in model_dict and v.size() == model_dict[k].size()}
     matched_state_dict_2 = {k: v for k, v in state_dict_emg.items() if
                             k in model_dict and v.size() == model_dict[k].size()}
 
-    # 更新新模型的状态字典
     model_dict.update(matched_state_dict_1)
     model_dict.update(matched_state_dict_2)
 
-    # 将更新后的状态字典加载到新模型
     model.load_state_dict(model_dict)
-    #
+
     unfrozen_params = [
         "lstm_z_eeg.weight_ih_l0",
         "lstm_z_eeg.weight_hh_l0",
@@ -155,7 +148,6 @@ for iteration in range(1, 21):
         "lstm_l_emg.weight_hh_l0_reverse",
         "lstm_l_emg.bias_ih_l0_reverse",
         "lstm_l_emg.bias_hh_l0_reverse",
-
         "lstm_t_eeg.weight_ih_l0",
         "lstm_t_eeg.weight_hh_l0",
         "lstm_t_eeg.bias_ih_l0",
@@ -197,7 +189,6 @@ for iteration in range(1, 21):
         "cbam_emg.SpatialGate.spatial.conv.weight",
         "cbam_emg.SpatialGate.spatial.bn.weight",
         "cbam_emg.SpatialGate.spatial.bn.bias",
-
     ]
     for name, param in model.named_parameters():
         if name in matched_state_dict_1 or name in matched_state_dict_2:
@@ -312,7 +303,7 @@ for iteration in range(1, 21):
 
     best_test_accuracies.append(best_test)
     best_f1_scores.append(best_f1)
-    best_model_details[iteration] = (best_epoch, best_test, best_f1)  # 记录当前迭代中最佳模型的迭代次数和轮次
+    best_model_details[iteration] = (best_epoch, best_test, best_f1)   
 
 # 计算5次迭代中最佳测试准确度和F1分数的均值和标准差
 max_best_accuracy = np.max(best_test_accuracies)

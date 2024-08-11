@@ -3,8 +3,8 @@ from matplotlib.colors import ListedColormap
 from scipy.spatial import ConvexHull
 from sklearn.manifold import TSNE
 
-from shujuchuli_eeg_xingfugan import loading_data, save_model, load_model
-from shujuchuli_emg_xingfugan import loading_data2, load_model
+from dataprc_eeg_fun import loading_data, save_model, load_model
+from dataprc_emg_fun import loading_data2, load_model
 from sklearn.metrics import classification_report, confusion_matrix, f1_score
 import seaborn as sns
 import os
@@ -179,7 +179,7 @@ model = MULTAV_CLASSFICATIONModel1().to(device)
 
 # 加载已保存的模型权重
 saved_model = torch.load(
-        r"D:\pycharm\SKF\实验结果\our\eeg+emg-duoshijian\xingfugan\per_tongdao\0.007-0.000005-0.9512\best_model_iteration_10_epoch_2.pt.pt")
+        r"best_model_iteration_10_epoch_2.pt")
 
 # 提取状态字典
 state_dict = saved_model.state_dict()
