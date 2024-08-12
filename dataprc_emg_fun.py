@@ -50,7 +50,6 @@ def split_and_pad(sequence, num_rows):
 def balance_lists(samples_z, samples_b, samples_l, samples_t):
     max_length = max(len(samples_z), len(samples_b), len(samples_l), len(samples_t))
 
-    # 定义一个函数来扩展列表到指定的长度
     def extend_list(lst, target_length):
         original_length = len(lst)
 
